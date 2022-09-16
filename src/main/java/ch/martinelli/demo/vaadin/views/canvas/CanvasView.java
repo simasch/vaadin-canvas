@@ -3,10 +3,16 @@ package ch.martinelli.demo.vaadin.views.canvas;
 import ch.martinelli.demo.vaadin.views.MainLayout;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import com.vaadin.flow.server.StreamResource;
+
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @PageTitle("Canvas")
 @Route(value = "canvas", layout = MainLayout.class)
@@ -70,7 +76,16 @@ public class CanvasView extends VerticalLayout {
                             const canvas = document.getElementById("paint-canvas");
                             return canvas.toDataURL();
                             """)
-                    .then(jsonValue -> System.out.println(jsonValue.asString()));
+                    .then(jsonValue -> {
+                        String value = jsonValue.asString();
+                        byte[] bytes = value.replace("data:image/png;base64,", "").getBytes(StandardCharsets.UTF_8);
+                        byte[] png = Base64.getDecoder().decode(bytes);
+                        StreamResource imageResource = new StreamResource(
+                                "image.png",
+                                () -> new ByteArrayInputStream(png));
+                        Image image = new Image(imageResource, "image");
+                        add(image);
+                    });
         });
         add(save);
 
