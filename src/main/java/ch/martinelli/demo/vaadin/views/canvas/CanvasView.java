@@ -56,10 +56,6 @@ public class CanvasView extends VerticalLayout {
                       <button type="button" value="4"></button>
                       <button type="button" value="5"></button>
                     </div>
-                    <div class="buttons">
-                      <button id="clear" type="button">Clear</button>
-                      <button id="save" type="button">Save</button>
-                    </div>
                   </div>
                   <div class="right-block">
                     <canvas id="paint-canvas" width="640" height="400"></canvas>
@@ -69,7 +65,13 @@ public class CanvasView extends VerticalLayout {
         add(canvas);
 
         Button save = new Button("Save");
-        save.setId("save");
+        save.addClickListener(event -> {
+            save.getElement().executeJs("""
+                            const canvas = document.getElementById("paint-canvas");
+                            return canvas.toDataURL();
+                            """)
+                    .then(jsonValue -> System.out.println(jsonValue.asString()));
+        });
         add(save);
 
         Button clear = new Button("Clear");
@@ -81,7 +83,7 @@ public class CanvasView extends VerticalLayout {
 
     public void initPaint() {
         getElement().executeJs("""
-                this.initPaint = function () {
+                (function () {
                   // Definitions
                   var canvas = document.getElementById("paint-canvas");
                   var context = canvas.getContext("2d");
@@ -149,20 +151,7 @@ public class CanvasView extends VerticalLayout {
                   clearButton.addEventListener('click', function() {
                     context.clearRect(0, 0, canvas.width, canvas.height);
                   });
-                                
-                  // Handle Save Button
-                  var saveButton = document.getElementById('save');
-                                
-                  saveButton.addEventListener('click', function() {
-                    var imageName = prompt('Please enter image name');
-                    var canvasDataURL = canvas.toDataURL();
-                    var a = document.createElement('a');
-                    a.href = canvasDataURL;
-                    a.download = imageName || 'drawing';
-                    a.click();
-                  });
-                };
-                this.initPaint();
+                })();
                 """);
     }
 
