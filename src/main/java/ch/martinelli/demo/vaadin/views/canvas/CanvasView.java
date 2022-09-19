@@ -3,6 +3,7 @@ package ch.martinelli.demo.vaadin.views.canvas;
 import ch.martinelli.demo.vaadin.views.MainLayout;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
@@ -70,6 +71,8 @@ public class CanvasView extends VerticalLayout {
                 """);
         add(canvas);
 
+        Div imageDiv = new Div();
+
         Button save = new Button("Save");
         save.addClickListener(event -> {
             save.getElement().executeJs("""
@@ -84,7 +87,8 @@ public class CanvasView extends VerticalLayout {
                                 "image.png",
                                 () -> new ByteArrayInputStream(png));
                         Image image = new Image(imageResource, "image");
-                        add(image);
+                        imageDiv.removeAll();
+                        imageDiv.add(image);
                     });
         });
         add(save);
@@ -92,6 +96,8 @@ public class CanvasView extends VerticalLayout {
         Button clear = new Button("Clear");
         clear.setId("clear");
         add(clear);
+
+        add(imageDiv);
 
         initPaint();
     }
